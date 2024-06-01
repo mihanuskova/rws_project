@@ -1,0 +1,38 @@
+CREATE TABLE new_project AS
+SELECT 
+    base.JobSK,
+    base.SourceLanguageCode,
+    base.JobStateName,
+    base.Job,
+    base.CreatedDate,
+    base.CompletedDate,
+    base.Classification,
+    job.JobID,
+    job.ProjectNo,
+    job.isCurrent,
+    tasks.Wordcount
+FROM 
+    base
+INNER JOIN 
+    job ON base.JobSK = job.JobSK
+INNER JOIN 
+    tasks ON job.jobID = tasks.jobID;
+    
+SELECT * FROM new_project;
+
+ALTER TABLE new_project
+ADD Priority INT;
+
+UPDATE new_project
+SET Priority = 
+    CASE 
+        WHEN Classification = 'H' THEN 0
+        WHEN Classification = 'M' THEN 1
+        WHEN Classification = 'L' THEN 2
+        ELSE 3
+    END;
+
+DELETE FROM new_project
+WHERE JobStateName = 'Canceled';
+
+SELECT * FROM new_project;
